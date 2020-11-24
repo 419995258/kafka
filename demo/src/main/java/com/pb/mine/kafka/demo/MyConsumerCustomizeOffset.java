@@ -1,15 +1,23 @@
 package com.pb.mine.kafka.demo;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.TopicPartition;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
-public class MyConsumer {
+
+/**
+ * 自定义的offset
+ */
+public class MyConsumerCustomizeOffset {
 
 
     public static void main(String[] args) {
@@ -38,7 +46,23 @@ public class MyConsumer {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 
         //消费者订阅主题
-        consumer.subscribe(Arrays.asList("first"));
+        consumer.subscribe(Arrays.asList("first"), new ConsumerRebalanceListener() {
+            @Override
+            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                //该方法会在 Rebalance 之前调用,比如存储在mysql
+                commitOffset(currentOffset);
+            }
+
+            @Override
+            public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                //该方法会在 Rebalance 之后调用
+                currentOffset.clear();
+                for (TopicPartition partition : partitions) {
+                    consumer.seek(partition, getOffset(partition));//定位到最近提交的 offset 位置继续消费
+                }
+
+            }
+        });
         while (true) {
             //消费者拉取数据
             ConsumerRecords<String, String> records = consumer.poll(100);
@@ -55,8 +79,20 @@ public class MyConsumer {
                     System.err.println("Commit failed for" + offsets);
                 }
             });
-
         }
 
+    }
+
+    private static Map<TopicPartition, Long> currentOffset = new HashMap<>();
+
+
+    //获取某分区的最新 offset
+    private static long getOffset(TopicPartition partition) {
+        // 从mysql获取
+        return 0;
+    }
+    //提交该消费者所有分区的 offset
+    private static void commitOffset(Map<TopicPartition, Long> currentOffset) {
+        // 存储到mysql
     }
 }
