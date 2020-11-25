@@ -7,6 +7,8 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
@@ -44,6 +46,15 @@ public class MyProduce {
 
         // 自定义的分区规则器
         // props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG,"com.pb.mine.kafka.demo.MyPartitioner");
+
+        // 拦截器
+        //  构建拦截链
+        /*
+        List<String> interceptors = new ArrayList<>();
+        interceptors.add("com.pb.mine.kafka.demo.Interceptor.TimeInterceptor");
+        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,interceptors);
+        //  一定要关闭 producer.close()，这样才会调用 interceptor 的 close 方法
+        */
 
         Producer<String, String> producer = new
                 KafkaProducer<>(props);
