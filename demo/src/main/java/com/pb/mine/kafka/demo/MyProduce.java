@@ -24,7 +24,8 @@ public class MyProduce {
      */
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         Properties props = new Properties();
-        //kafka 集群，broker-list
+        //kafka 集群，broker-list，ip配置在/etc/hosts 里配置下
+        // 192.168.132.128 win7xuniji.localdomain win7xuniji
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "win7xuniji:9092");
         props.put(ProducerConfig.ACKS_CONFIG, "all");
         //重试次数

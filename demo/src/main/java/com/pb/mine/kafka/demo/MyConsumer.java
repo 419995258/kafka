@@ -14,7 +14,8 @@ public class MyConsumer {
 
     public static void main(String[] args) {
         Properties props = new Properties();
-        //kafka 集群，broker-list
+        //kafka 集群，broker-list，ip配置在/etc/hosts 里配置下
+        // 192.168.132.128 win7xuniji.localdomain win7xuniji
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "win7xuniji:9092");
         // 自动提交
 //        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
